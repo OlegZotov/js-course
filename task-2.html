@@ -1,0 +1,72 @@
+<!DOCCTYPE html>
+<html>
+<head>
+<style type="text/css">
+div 
+{
+color:red;
+font-weight: bold;
+}
+</style>
+</head>
+<script>
+Object.prototype.foo="bar";
+var computer = {
+	type:"portable",
+	hardware:{
+		peripheralDevices:{
+			mouse:{
+				producer:"microsoft",
+				buttons:{
+					count:2,
+					type:"optical",
+					withWheel:true				
+				},
+			},
+			keyboard:{
+				producer:"microsoft",
+                                buttons:{
+                                        count:45,
+                                        withNumPad:true                         
+                                }
+
+			},
+			monitor:{
+				type:"LCD",
+				resolution:{
+					width:1366,
+					height:768,
+				}
+			}
+		}
+	},
+	software:{
+		operatingSystem:"ubuntu"
+	}
+};
+
+
+function clone(tempObj){
+	if(typeof tempObj == 'object'){
+		var tempResObj = {};
+		for(var property in tempObj){
+			if(tempObj.hasOwnProperty(property)){
+				tempResObj[property] = recClone(tempObj[property]);
+			}
+  		} 
+		return tempResObj;
+	}else{
+		return tempObj;
+	}
+
+}
+
+var clonedObj = clone(computer);
+console.log(clonedObj);
+console.log(JSON.stringify(clonedObj));
+
+</script>
+<body>
+<div id="someId">Some text content</div>
+</body>
+</html>

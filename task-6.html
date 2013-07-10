@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head><title>Working with objects and state</title>
+<style>
+.example-box {
+    border-radius: 7px;
+    box-shadow: 0px 10px 15px #866;
+    margin: 50px;
+    padding: 5px;
+    width: 150px;
+    border: solid 1px #800;
+    background-color: #fcc;
+}
+
+.non-selectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.rotating {
+    transform: rotate(10deg);
+    -webkit-transform: rotate(10deg);
+}
+
+body {
+    font-family: 'Helvetica', sans-serif;
+    font-size: 12pt;
+    background-color: #eee;
+}
+
+article {
+    border-radius: 10px;
+    background-color: white;
+    width: 600px;
+    padding: 10px;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.vertically-spaced {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+iframe, .iframe-wrap {
+    width: 250px;
+    height: 145px;
+    border: none;
+    overflow: hidden;
+}
+
+pre {
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+
+<article class="centered">
+    Here is a simple test which shows how to rotate a box.
+    This test demonstrates the use of CSS and low level JavaScript to exploit
+    the <a class="rotating" href="http://www.w3.org/TR/css3-transforms/">CSS3 Transforms</a> API.
+
+    <div class="rotating non-selectable clickable example-box centered">
+      This text is rotated at <b>10&deg;</b> angle. Try clicking it.
+    </div>
+
+    Create a JavaScript object <code>Wobbler</code> which makes the given HTML element wobble like shown below.
+    <div class="rotating" class="centered iframe-wrap vertically-spaced">
+        <iframe src="http://lionet.info/ta-cal/"></iframe>
+    </div>
+
+    You should be able to make more than one object independently wobbling
+    by executing something like this:
+    <pre class="rotating" >
+    var divs = document.getElementsByClassName("rotating");
+    for(var i = 0; i < divs.length; i++) {
+        new Wobbler(divs[i]);
+    }</pre>
+</article>
+
+<script src="script-6.js"></script>
+
+</body>
+</html>
+
