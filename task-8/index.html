@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="js/underscore-1.4.4.js"></script>
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/json2.js"></script>
+    <script src="js/backbone-1.0.0.js"></script>
+    <script src="generic-rest-model.js"></script>
+    <style>
+      .restaurantClass {
+        width: 400px;
+        border: solid 1px darkred;
+        background-color: #faa;
+        padding: 10px;
+      }
+      li {
+        list-style-type: none;
+        background-color: #aaf;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h2>Backbone's View</h2>
+    <div id="info">
+    </div>
+    <ul id="visitors">
+    </ul>
+
+
+    <script id="restaurant-template" type="text/underscore-template">
+      Restaurant “<%- restaurantName %>” is <b><%- state %></b>.<br>
+      Visitors: <%- currentOccupancy %><br>
+      <input type="button" value="add" id="add">
+      <input type="button" value="open" id="open"> 
+    </script>
+
+    <script id="visitor-template" type="text/underscore-template">
+      visitor cid = <%- title %>
+    </script>
+
+
+    <script>
+
+      var Visitor = Backbone.Model.extend({
+        defaults: { lastCheckin: "" },
+
+        checkin: function(venue) {
+          this.set("lastCheckin", venue);
+          if(this.get("title")) {
+            console.log("Visitor " + this.get("title") + " checked in at" + venue);
+          }
+        }
+      });
+
+      var VisitorView = Backbone.View.extend({
+        tagName: "li",
+
+        tmpl: _.template($("#visitor-template").html()),
+
+        events: {
+          "click": "goOut"
+        },
+
+        initialize: function() {
+          this.listenTo(this.model, "destroy", this.remove);
+          this.render();
+        },
+
+        render: function() {
+          this.$el.html(this.tmpl(this.model.attributes));
+          return this;
+        },
+
+        goOut: function() {
+          this.model.destroy();
+        }
+      });
+
+      var VisitorsList = Backbone.Collection.extend({ model: Visitor });
+
+      var RestaurantModel = GenericRestaurantModel.extend({
+        initialize: function() {
+          var visitors = new VisitorsList;
+          this.set("visitors", visitors);
+
+          visitors.on("add", function(visitor) {
+            visitor.checkin(this.get("restaurantName"));
+          }, this);
+
+          visitors.on("remove", function() {
+            GenericRestaurantModel.prototype.visitorLeft.call(this)
+          }, this);
+        },
+
+        visitorCame: function(visitor) {
+          if(!this.get("visitors").get(visitor)) {
+            if(GenericRestaurantModel.prototype.visitorCame.call(this)){
+              this.get("visitors").add(visitor);
+            }
+          }
+        }
+      });
+
+      var RestaurantView = Backbone.View.extend({
+        className: "restaurantClass",
+
+        tmpl: _.template($("#restaurant-template").html()),
+
+        events: {
+          "click #add": "doVisitorCame",
+          "click #open": "doOpen",
+        },
+        initialize: function() {
+          this.listenTo(this.model, "change", this.render);
+          this.listenTo(this.model.get("visitors"), "add", this.showNewVisitor);
+          this.render();
+        },
+        render: function() {
+          this.$el.html(this.tmpl(this.model.attributes));
+          return this;
+        },
+        doVisitorCame: function() {
+          var visitors = this.model.get("visitors");
+          var visitor = new Visitor({ firstName: "visitor", title: "number" + visitors.length });
+          this.model.visitorCame(visitor);
+        },
+        doOpen: function() {
+          this.model.openRestaurant();
+        },
+        showNewVisitor: function(visitor) {
+          var visitorView = new VisitorView({ model: visitor });
+          $("#visitors").append(visitorView.render().el);
+        },
+      });
+      var restModel = new RestaurantModel({ restaurantName: "my own rest" });
+
+      var restView = new RestaurantView({ model: restModel });
+
+      $("#info").append(restView.el);
+
+    </script>
+  </body>
+</html>
